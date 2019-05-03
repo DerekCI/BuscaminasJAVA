@@ -22,7 +22,7 @@ public class Tablero extends JPanel {
     private int filas = 16, columnas = 16;
 
     private Celdas[][] celdas;
-    //private Image[] img;
+    private Image[] img;
 
     private boolean enCurso;
 
