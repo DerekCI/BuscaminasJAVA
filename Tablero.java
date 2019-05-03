@@ -34,7 +34,7 @@ public class Tablero extends JPanel {
             img[i] = new ImageIcon(ruta).getImage();
         }
         this.setDoubleBuffered(true);
-        this.addMouseListener(new MinesAdapter());
+        this.addMouseListener(new AdaptadorMinas());
         this.juegoNuevo();
     }
 
@@ -239,5 +239,5 @@ public class Tablero extends JPanel {
                 this.celdas[i][j].limpiarMarcada();
             }
         }
-}
+    }
 }
