@@ -49,7 +49,7 @@ public class Tablero extends JPanel {
 
         for (int i = 0; i < this.filas; ++i) {
             for (int j = 0; j < this.columnas; ++j) {
-                this.[i][j] = new Celdas();
+                this.celdas[i][j] = new Celdas();
             }
         }
     }
@@ -66,9 +66,9 @@ public class Tablero extends JPanel {
             int randX = random.nextInt(this.filas);
             int randY = random.nextInt(this.columnas);
 
-            Celdas celda = this.celdass[randX][randY];
-            if (!celda.isMine()) {
-                celda.setMine(true);
+            Celdas celda = this.celdas[randX][randY];
+            if (!celda.esMina()) {
+                celda.setMina(true);
                 aux--;
             }
         }
@@ -137,34 +137,34 @@ public class Tablero extends JPanel {
                 xPosition = (j * TAM_CELDAS);
                 yPosition = (i * TAM_CELDAS);
 
-                g.drawImage(img[imageType], xPosition, yPosition, this);
+                g.drawImage(img[tipoImagen], xPosition, yPosition, this);
             }
         }
-        if (coveredCells == 0 && inGame) {
-            inGame = false;
-            statusBar.setText("Game Won");
-        } else if (!inGame) {
-            statusBar.setText("Game Lost");
+        if (celdasCubiertas == 0 && enCurso) {
+            enCurso = false;
+            barraStatus.setText("Juego Ganado");
+        } else if (!enCurso) {
+            barraStatus.setText("Juego Perdido");
         }
     }
     private int decideTipo(Celdas celda) {
         int tipoImagen = celda.getValor();
 
         if (!enCurso) {
-            if (celda.estaCubierto() && cell.esMina()) {
+            if (celda.estaCubierto() && celda.esMina()) {
                 celda.descubierto();
-                imageType = IMAGEN_MINE;
-            } else if (cell.esBandera()) {
+                tipoImagen = IMAGEN_MINE;
+            } else if (celda.esBandera()) {
                 if (celda.esMina()) {
                     tipoImagen = IMAGEN_BANDERA;
                 } else {
-                    tipoImagen = IMAGE_NO_BANDERA;
+                    tipoImagen = IMAGEN_NO_BANDERA;
                 }
             }
         } else {
             if (celda.esBandera()) {
                 tipoImagen = IMAGEN_BANDERA;
-            } else if (cell.isCovered()) {
+            } else if (celda.estaCubierto()) {
                 tipoImagen = IMAGEN_COVER;
             }
         }
@@ -231,7 +231,7 @@ public class Tablero extends JPanel {
             }
         }
     }
-    private boolean revisarVacio(Celda celda) {
+    private boolean revisarVacio(Celdas celda) {
         if (!celda.esBandera()) {
             if (celda.vacio()) {
                 return true;
@@ -243,6 +243,61 @@ public class Tablero extends JPanel {
         for (int i = 0; i < this.filas; ++i) {
             for (int j = 0; j < this.columnas; ++j) {
                 this.celdas[i][j].limpiarMarcada();
+            }
+        }
+    }
+    public class AdaptadorMinas extends MouseAdapter {
+        public void mousePressed(MouseEvent e) {
+            int columnaClickeada = e.getX() / TAM_CELDAS;
+            int filaClickeada = e.getY() / TAM_CELDAS;
+
+            boolean rePaint = false;
+            Celdas celdaClickeada;
+
+            if (!enCurso) {
+                juegoNuevo();
+                repaint();
+            }
+
+            if ((columnaClickeada < 0 || columnaClickeada >= columnas)
+                || (filaClickeada < 0 || filaClickeada >= filas)) {
+                return;
+            }
+
+            celdaClickeada = celdas[filaClickeada][columnaClickeada];
+
+            if (e.getButton() == MouseEvent.BUTTON3) {
+                rePaint = true;
+
+                if (!celdaClickeada.estaCubierto()) {
+                    return;
+                }
+
+                String str;
+                if (!celdaClickeada.esBandera()) {
+                    celdaClickeada.setBandera(true);
+                    auxMinas--;
+                } else {
+                    celdaClickeada.setBandera(false);
+                    auxMinas++;
+                }
+                barraStatus.setText(Integer.toString(auxMinas));
+            } else {
+                if (celdaClickeada.esBandera() || !celdaClickeada.estaCubierto()) {
+                    return;
+                }
+
+                rePaint = true;
+                celdaClickeada.descubierto();
+                if (celdaClickeada.esMina()) {
+                    enCurso = false;
+                } else if (celdaClickeada.vacio()) {
+                    encontrarCeldasVacias(filaClickeada, columnaClickeada, 0);
+                }
+            }
+
+            if (rePaint) {
+                repaint();
             }
         }
     }
