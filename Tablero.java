@@ -233,4 +233,11 @@ public class Tablero extends JPanel {
         }
         return false;
     }
+    private void limpiarCeldas() {
+        for (int i = 0; i < this.filas; ++i) {
+            for (int j = 0; j < this.columnas; ++j) {
+                this.celdas[i][j].limpiarMarcada();
+            }
+        }
+}
 }
