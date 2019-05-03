@@ -1,14 +1,3 @@
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import java.util.Random;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 public class Celdas {
     private boolean mina;
     private boolean bandera;
@@ -17,7 +6,7 @@ public class Celdas {
 
     private int valor;
 
-    public Celda() {
+    public Celdas() {
         this.cubierto = true;
         this.bandera  = false;
         this.mina  = false;
