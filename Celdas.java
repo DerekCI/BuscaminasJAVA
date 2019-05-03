@@ -17,7 +17,7 @@ public class Celdas {
 
     private int valor;
 
-    public Cell() {
+    public Celda() {
         this.cubierto = true;
         this.bandera  = false;
         this.mina  = false;
