@@ -4,7 +4,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import java.util.Random;
-
+import javax.swing.JTextField;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -31,16 +31,23 @@ public class Tablero extends JPanel {
     private Image[] img;
 
     private boolean enCurso;
+    public int turnos;
 
-    public Tablero(JLabel barraStatus) {
+    private String jugador1;
+    private String jugador2;
+    
+
+    public Tablero(JLabel barraStatus, String jugador1, String jugador2) {
         this.barraStatus = barraStatus;
+        this.jugador1 = jugador1;
+        this.jugador2 = jugador2;
         this.img = new Image[NUM_IMAGENES];
         for (int i = 0; i < NUM_IMAGENES; i++) {
-            String ruta = "img/j" + i + ".gif";
+            String ruta = "imagenes/j" + i + ".gif";
             img[i] = new ImageIcon(ruta).getImage();
         }
         this.setDoubleBuffered(true);
-        this.addMouseListener(new AdaptadorMinas());
+        this.addMouseListener(new ControlDeJuego());
         this.juegoNuevo();
     }
 
@@ -54,6 +61,7 @@ public class Tablero extends JPanel {
         }
     }
     public void juegoNuevo (){
+        this.turnos = 0;
         Random random = new Random();
         this.enCurso = true;
         this.auxMinas = numMinas;
@@ -142,9 +150,18 @@ public class Tablero extends JPanel {
         }
         if (celdasCubiertas == 0 && enCurso) {
             enCurso = false;
-            barraStatus.setText("Juego Ganado");
+            if(turnos%2==1){
+                barraStatus.setText("Gana "+jugador2);
+            }else{
+                barraStatus.setText("Gana "+jugador1);
+            }
+            
         } else if (!enCurso) {
-            barraStatus.setText("Juego Perdido");
+            if(turnos%2==1){
+                barraStatus.setText("Gana "+jugador2);
+            }else{
+                barraStatus.setText("Gana "+jugador1);
+            }
         }
     }
     private int decideTipo(Celdas celda) {
@@ -246,7 +263,7 @@ public class Tablero extends JPanel {
             }
         }
     }
-    public class AdaptadorMinas extends MouseAdapter {
+    public class ControlDeJuego extends MouseAdapter {
         public void mousePressed(MouseEvent e) {
             int columnaClickeada = e.getX() / TAM_CELDAS;
             int filaClickeada = e.getY() / TAM_CELDAS;
@@ -268,22 +285,26 @@ public class Tablero extends JPanel {
 
             if (e.getButton() == MouseEvent.BUTTON3) {
                 rePaint = true;
-
+                turnos++;
                 if (!celdaClickeada.estaCubierto()) {
+                    
                     return;
                 }
 
                 String str;
                 if (!celdaClickeada.esBandera()) {
                     celdaClickeada.setBandera(true);
+                    
                     auxMinas--;
                 } else {
                     celdaClickeada.setBandera(false);
+
                     auxMinas++;
                 }
                 barraStatus.setText(Integer.toString(auxMinas));
             } else {
                 if (celdaClickeada.esBandera() || !celdaClickeada.estaCubierto()) {
+                 
                     return;
                 }
 
@@ -293,6 +314,7 @@ public class Tablero extends JPanel {
                     enCurso = false;
                 } else if (celdaClickeada.vacio()) {
                     encontrarCeldasVacias(filaClickeada, columnaClickeada, 0);
+               
                 }
             }
 
